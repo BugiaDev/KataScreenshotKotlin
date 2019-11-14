@@ -8,6 +8,7 @@ import com.karumi.domain.model.SuperHero
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Test
 import org.mockito.Mock
+import kotlin.random.Random
 
 class MainActivityTest : AcceptanceTest<MainActivity>(MainActivity::class.java) {
 
@@ -23,6 +24,34 @@ class MainActivityTest : AcceptanceTest<MainActivity>(MainActivity::class.java) 
         compareScreenshot(activity)
     }
 
+    @Test
+    fun showsOnlyOneSuperHero() {
+        givenThereAreSomeSuperHeroes()
+        val activity = startActivity()
+        compareScreenshot(activity)
+    }
+
+    @Test
+    fun showsScreenPlentyOfSuperHeroes() {
+        givenThereAreSomeSuperHeroes(5)
+        val activity = startActivity()
+        compareScreenshot(activity)
+    }
+
+    @Test
+    fun showsScreenPlentyOfAvengers() {
+        givenThereAreSomeSuperHeroes(5, true)
+        val activity = startActivity()
+        compareScreenshot(activity)
+    }
+
+    @Test
+    fun showsScreenWithMixedAvengersAndRegularHeroes() {
+        givenSomeMixedHeroes(5)
+        val activity = startActivity()
+        compareScreenshot(activity)
+    }
+
     private fun givenThereAreSomeSuperHeroes(
         numberOfSuperHeroes: Int = 1,
         avengers: Boolean = false
@@ -32,6 +61,23 @@ class MainActivityTest : AcceptanceTest<MainActivity>(MainActivity::class.java) 
             val superHeroDescription = "Description Super Hero - $id"
             SuperHero(
                 superHeroName, null, avengers,
+                superHeroDescription
+            )
+        }
+
+        whenever(repository.getAllSuperHeroes()).thenReturn(superHeroes)
+        return superHeroes
+    }
+
+    private fun givenSomeMixedHeroes(
+        numberOfSuperHeroes: Int = 1,
+        lastAvengerFlag: Boolean = true
+    ): List<SuperHero> {
+        val superHeroes = IntRange(0, numberOfSuperHeroes - 1).map { id ->
+            val superHeroName = "SuperHero - $id"
+            val superHeroDescription = "Description Super Hero - $id"
+            SuperHero(
+                superHeroName, null, !lastAvengerFlag,
                 superHeroDescription
             )
         }
